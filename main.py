@@ -13,6 +13,11 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Inlin
 
 import datetime, pytz
 
+import os
+
+# pip install python-dotenv
+from dotenv import load_dotenv
+
 
 import ActivityManager
 
@@ -268,9 +273,8 @@ def get_summary(context):
 
     global daily_activities
 
+    # Store history of actiivities
     data_file = "data.txt"
-
-    
 
     # If the list is empty for the day, just record the date
     if not daily_activities:
@@ -309,17 +313,19 @@ def get_summary(context):
     # Clear daily activities for next day
     daily_activities = []
 
-
-
     print("Cleared day activities.\n")
 
 def main():
     
-    bot_token = "1573984696:AAEJvtgJSFewMPxkI6muXEAJwrw3FTwfeYc"
+    # Load the .env file with the Discord token stored in file as
+    # DISCORD_TOKEN = 'XXXXXXXXXXXXXXXXX'
+    load_dotenv()
+    TOKEN = os.getenv('DISCORD_TOKEN')  
     
-    updater = Updater(bot_token, use_context=True)
+    updater = Updater(TOKEN, use_context=True)
 
     # Record all daily activities at 23h45 everyday
+    # Requires that the script is always running
     job = updater.job_queue
     job.run_daily(get_summary, datetime.time(hour=23, minute=55, tzinfo=pytz.timezone('Africa/Windhoek')),
                                     days=(0, 1, 2, 3, 4, 5, 6),context=None,name=None)
